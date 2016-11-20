@@ -4,4 +4,4 @@ Siin repos on kood, mida kasutasin [Eesti palgajaotuse ja palgalõhe](http://pun
 
 Peamine analüüsiskript on `analysis.r`. `helpers.r` sisaldab paari abifunktsiooni log-normaaljaotuse fittimiseks ja kaustas `data/` on Statistikaametist võetud andmed.
 
-Litsents on [siin](LICENSE.md).
+Litsents on [siin](LICENSE.txt).
