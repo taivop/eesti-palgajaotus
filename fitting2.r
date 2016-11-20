@@ -25,7 +25,8 @@ pa621 <- read.csv("data/pa621.csv") %>%
   rename(palk=value)
 
 data <- pa621 %>%
-  rbind(pa629)
+  rbind(pa629) %>%
+  rename(Grupp=variable, Palk=palk, Osakaal=prob)
 
 # ------------------
 # ---- Plotting ----
@@ -33,9 +34,8 @@ data <- pa621 %>%
 
 men_women_colors <- c("#09B251", "#9700FF")
 
-# Cumulative prob
-data1 <- data %>%
-  rename(Grupp=variable, Palk=palk, Osakaal=prob)
+# ---- Cumulative probabilities directly from data ----
+data1 <- data
 ggplot(data1 %>% filter(Grupp != "Kokku"), aes(x=Palk, y=Osakaal, color=Grupp)) +
   geom_point() +
   geom_line() +
@@ -64,32 +64,30 @@ plotly_POST(filename="post-60-palgajaotus", fileopt="overwrite")
 
 # ---- Fitting lognormal distribution ----
 salary <- seq(0, 3000, 10)
-men <- data %>% filter(variable=="Mehed") %>% arrange(prob)
-palk_ennustus <- predict_quantiles_lnorm(men$palk, men$prob, men$prob)
+men <- data %>% filter(Grupp=="Mehed") %>% arrange(Osakaal)
+palk_ennustus <- predict_quantiles_lnorm(men$Palk, men$Osakaal, men$Osakaal)
 men <- men %>%
-  mutate(EnnustatudPalk=round(palk_ennustus)) %>%
-  rename(Palk=palk)
+  mutate(EnnustatudPalk=round(palk_ennustus))
 
-probs <- get_salary_dist_lnorm(men$Palk, men$prob, salary)
-kumulatiivne <- 100 * get_salary_dist_cum_lnorm(men$Palk, men$prob, salary)
+probs <- get_salary_dist_lnorm(men$Palk, men$Osakaal, salary)
+kumulatiivne <- 100 * get_salary_dist_cum_lnorm(men$Palk, men$Osakaal, salary)
 men_dist <- data.frame(salary, probs) %>%
   mutate(type="Mehed",
          Kumulatiivne=kumulatiivne)
 
-women <- data %>% filter(variable=="Naised") %>% arrange(prob)
-palk_ennustus <- predict_quantiles_lnorm(women$palk, women$prob, women$prob)
+women <- data %>% filter(Grupp=="Naised") %>% arrange(Osakaal)
+palk_ennustus <- predict_quantiles_lnorm(women$Palk, women$Osakaal, women$Osakaal)
 women <- women %>%
-  mutate(EnnustatudPalk=round(palk_ennustus)) %>%
-  rename(Palk=palk)
+  mutate(EnnustatudPalk=round(palk_ennustus))
 
-probs2 <- get_salary_dist_lnorm(women$Palk, women$prob, salary)
-kumulatiivne2 <- 100 * get_salary_dist_cum_lnorm(women$Palk, women$prob, salary)
+probs2 <- get_salary_dist_lnorm(women$Palk, women$Osakaal, salary)
+kumulatiivne2 <- 100 * get_salary_dist_cum_lnorm(women$Palk, women$Osakaal, salary)
 women_dist <- data.frame(salary, probs=probs2) %>%
   mutate(type="Naised",
          Kumulatiivne=kumulatiivne2)
 
 # ---- Checking fit: salary vs predicted salary ----
-ggplot(men %>% rename(Grupp=variable), aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: ", round(prob*100, digits=1), "%"), group=Grupp)) +
+ggplot(men, aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: ", round(Osakaal*100, digits=1), "%"), group=Grupp)) +
   geom_point() +
   geom_line() +
   geom_abline(intercept=0, slope=1, color="red") +
@@ -102,7 +100,7 @@ ggsave("graphs/checkingmodel-men.png", width=7, height=5)
 ggplotly(width=700, height=300)
 plotly_POST(filename="post-60-checkingmodel-men", fileopt="overwrite")
 
-ggplot(women %>% rename(Grupp=variable), aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: ", round(prob*100, digits=1), "%"), group=1)) +
+ggplot(women, aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: ", round(Osakaal*100, digits=1), "%"), group=1)) +
   geom_point() +
   geom_line() +
   geom_abline(intercept=0, slope=1, color="red") +
@@ -118,15 +116,15 @@ plotly_POST(filename="post-60-checkingmodel-women", fileopt="overwrite")
 # ---- Checking fit: percentiles ----
 men_colors <- c("#09B251", "#888888")
 men_melted <- men %>%
-  select(-variable) %>%
-  melt(id.vars=c("prob")) %>%
-  rename(Allikas=variable, Palk=value, KumulatiivneOsakaal=prob)
+  select(-Grupp) %>%
+  melt(id.vars=c("Osakaal")) %>%
+  rename(Allikas=variable, Palk=value, KumulatiivneOsakaal=Osakaal)
 ggplot(men_melted, aes(x=Palk, y=KumulatiivneOsakaal, color=Allikas)) +
   geom_point() +
   geom_line() +
   scale_color_manual(values=men_colors) +
   xlim(0, NA) + ylim(0, NA) +
-  xlab("Brutopalk [€]") + ylab("Osakaal") +
+  xlab("Brutopalk [€]") + ylab("Kumulatiivne osakaal") +
   ggtitle("Tegelik ja mudeli ennustatud palk, mehed") +
   theme_bw()
 makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
@@ -136,15 +134,15 @@ plotly_POST(filename="post-60-checkingmodel-men-percentiles", fileopt="overwrite
 
 women_colors <- c("#9700FF", "#888888")
 women_melted <- women %>%
-  select(-variable) %>%
-  melt(id.vars=c("prob")) %>%
-  rename(Allikas=variable, Palk=value, KumulatiivneOsakaal=prob)
+  select(-Grupp) %>%
+  melt(id.vars=c("Osakaal")) %>%
+  rename(Allikas=variable, Palk=value, KumulatiivneOsakaal=Osakaal)
 ggplot(women_melted, aes(x=Palk, y=KumulatiivneOsakaal, color=Allikas)) +
   geom_point() +
   geom_line() +
   scale_color_manual(values=women_colors) +
   xlim(0, NA) + ylim(0, NA) +
-  xlab("Brutopalk [€]") + ylab("Osakaal") +
+  xlab("Brutopalk [€]") + ylab("Kumulatiivne osakaal") +
   ggtitle("Tegelik ja mudeli ennustatud palk, naised") +
   theme_bw()
 makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
@@ -186,10 +184,10 @@ plotly_POST(filename="post-60-palgajaotus-modelboth-cum", fileopt="overwrite")
 true_mean_men <- 1192
 true_mean_women <- 896
 
-meanlog_men <- get_params_lnorm(men$Palk, men$prob)$meanlog
-sdlog_men <- get_params_lnorm(men$Palk, men$prob)$sdlog
-meanlog_women <- get_params_lnorm(women$Palk, women$prob)$meanlog
-sdlog_women <- get_params_lnorm(women$Palk, women$prob)$sdlog
+meanlog_men <- get_params_lnorm(men$Palk, men$Osakaal)$meanlog
+sdlog_men <- get_params_lnorm(men$Palk, men$Osakaal)$sdlog
+meanlog_women <- get_params_lnorm(women$Palk, women$Osakaal)$meanlog
+sdlog_women <- get_params_lnorm(women$Palk, women$Osakaal)$sdlog
 
 predicted_mean_men <- round(exp(meanlog_men + sdlog_men * sdlog_men / 2))
 predicted_mean_women <- round(exp(meanlog_women + sdlog_women * sdlog_women / 2))
