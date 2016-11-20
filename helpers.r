@@ -29,20 +29,3 @@ predict_quantiles_lnorm <- function(true_quantiles, probabilities, probs_predict
   fit <- get_params_lnorm(true_quantiles, probabilities)
   return(qlnorm(probabilities, meanlog=fit$meanlog, sdlog=fit$sdlog))
 }
-
-# ---- Other helper functions ----
-
-get_noncum_dist <- function(df) {
-  df <- df %>%
-    arrange(prob)
-  
-  lower_lim <- 0
-  for(i in nrow(df)) {
-    row <- df[i,]
-    prob <- row$prob
-    upper_lim <- row$palk
-    
-    
-    lower_lim <- upper_lim
-  }
-}
