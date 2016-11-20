@@ -8,7 +8,8 @@ library(plotly)
 source("helpers.r")
 source("/Users/taivo/Google Drive/blog/ggplot-template/template.R")
 
-pa629 <- read_excel("data/pa629.xlsx") %>%
+pa629 <- read.csv("data/pa629.csv") %>%
+  mutate(Palgavahemik=as.character(Palgavahemik)) %>%
   mutate(alampiir=sapply(Palgavahemik, function(x) strsplit(x, "-")[[1]][1]),
          ülempiir=sapply(Palgavahemik, function(x) strsplit(x, "-")[[1]][2])) %>%
   mutate(alampiir=as.numeric(alampiir), ülempiir=as.numeric(ülempiir)) %>%
