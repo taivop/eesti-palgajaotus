@@ -1,12 +1,15 @@
 library(dplyr)
 library(ggplot2)
 library(reshape2)
-library(readxl)
 library(rriskDistributions)
 library(plotly)
 
 source("helpers.r")
 source("/Users/taivo/Google Drive/blog/ggplot-template/template.R")
+
+# ----------------------
+# ---- Reading data ----
+# ----------------------
 
 pa629 <- read.csv("data/pa629.csv") %>%
   mutate(Palgavahemik=as.character(Palgavahemik)) %>%
