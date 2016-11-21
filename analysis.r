@@ -5,7 +5,6 @@ library(rriskDistributions)
 library(plotly)
 
 source("helpers.r")
-source("/Users/taivo/Google Drive/blog/ggplot-template/template.R")
 
 # ----------------------
 # ---- Reading data ----
@@ -46,7 +45,6 @@ ggplot(data %>% filter(Grupp != "Kokku"), aes(x=Palk, y=`Kumulatiivne osakaal`, 
   xlab("Brutopalk [€]") +
   theme_bw() +
   theme(legend.position="top")
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/palgajaotus-mn.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-palgajaotus-mn", fileopt="overwrite")
@@ -59,7 +57,6 @@ ggplot(data %>% filter(Grupp=="Kokku"), aes(x=Palk, y=`Kumulatiivne osakaal`)) +
   xlab("Brutopalk [€]") +
   theme_bw() +
   theme(legend.position="none")
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/palgajaotus.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-palgajaotus", fileopt="overwrite")
@@ -97,7 +94,6 @@ ggplot(men, aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: ", 
   xlab("Brutopalk [€]") + ylab("Mudeli ennustatud brutopalk [€]") +
   ggtitle("Tegelik vs ennustatud palk, mehed") +
   theme_bw()
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/checkingmodel-men.png", width=7, height=5)
 ggplotly(width=700, height=300)
 plotly_POST(filename="post-60-checkingmodel-men", fileopt="overwrite")
@@ -110,7 +106,6 @@ ggplot(women, aes(x=Palk, y=EnnustatudPalk, text=paste0("Kumulatiivne osakaal: "
   xlab("Brutopalk [€]") + ylab("Mudeli ennustatud brutopalk [€]") +
   ggtitle("Tegelik vs ennustatud palk, naised") +
   theme_bw()
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/checkingmodel-women.png", width=7, height=5)
 ggplotly(width=700, height=300)
 plotly_POST(filename="post-60-checkingmodel-women", fileopt="overwrite")
@@ -129,7 +124,6 @@ ggplot(men_melted, aes(x=Palk, y=`Kumulatiivne osakaal`, color=Allikas)) +
   xlab("Brutopalk [€]") +
   ggtitle("Tegelik ja mudeli ennustatud palk, mehed") +
   theme_bw()
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/checkingmodel-men-percentiles.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-checkingmodel-men-percentiles", fileopt="overwrite")
@@ -147,7 +141,6 @@ ggplot(women_melted, aes(x=Palk, y=`Kumulatiivne osakaal`, color=Allikas)) +
   xlab("Brutopalk [€]") + ylab("Kumulatiivne osakaal") +
   ggtitle("Tegelik ja mudeli ennustatud palk, naised") +
   theme_bw()
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/checkingmodel-women-percentiles.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-checkingmodel-women-percentiles", fileopt="overwrite")
@@ -165,7 +158,6 @@ ggplot(both, aes(x=Palk, y=Tihedus, text=paste0("Kumulatiivne osakaal: ", Kumula
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank())
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/palgajaotus-modelboth.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-palgajaotus-modelboth", fileopt="overwrite")
@@ -177,7 +169,6 @@ ggplot(both, aes(x=Palk, y=Kumulatiivne)) +
   scale_fill_manual(values=men_women_colors) +
   ylab("Kumulatiivne osakaal, %") +
   theme_bw()
-makeFootnote(footnoteText=paste0("Taivo Pungas | pungas.ee"))
 ggsave("graphs/palgajaotus-modelboth-cum.png", width=7, height=5)
 ggplotly(width=700, height=500)
 plotly_POST(filename="post-60-palgajaotus-modelboth-cum", fileopt="overwrite")
